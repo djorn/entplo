@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporal Displacement Field</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #f4f1e8;
+            --primary-stroke: #1a1a1a;
+            --glitch-red: #ff3366;
+            --glitch-cyan: #33ffaa;
+            --glitch-yellow: #ffaa33;
+            --node-radius: 6px;
+            --line-weight: 1.8px;
+            --hand-variation: 0.5px;
+        }
+
+        body {
+            background: var(--bg-color);
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            overflow: hidden;
+            height: 100vh;
+            color: var(--primary-stroke);
+            cursor: crosshair;
+        }
+
+        .reality-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .temporal-header {
+            position: absolute;
+            top: 5vh;
+            text-align: center;
+            z-index: 100;
+            will-change: transform;
+        }
+
+        .main-title {
+            font-size: clamp(1.5rem, 4vw, 3.5rem);
+            font-weight: 100;
+            letter-spacing: 0.3em;
+            margin-bottom: 0.5rem;
+            animation: titleReality 12s infinite;
+            text-transform: uppercase;
+        }
+
+        .sub-protocol {
+            font-size: clamp(0.7rem, 1.5vw, 1rem);
+            opacity: 0.6;
+            letter-spacing: 0.1em;
+            animation: protocolFlicker 8s infinite;
+        }
+
+        .dimension-field {
+            position: relative;
+            width: 70vmin;
+            height: 70vmin;
+            max-width: 600px;
+            max-height: 600px;
+        }
+
+        .network-canvas {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 2px rgba(26, 26, 26, 0.15));
+            will-change: transform;
+        }
+
+        .temporal-footer {
+            position: absolute;
+            bottom: 5vh;
+            text-align: center;
+            font-size: 0.7rem;
+            opacity: 0.4;
+            letter-spacing: 0.05em;
+            animation: dataCorruption 15s infinite;
+        }
+
+        /* Advanced Hand-drawn Effects */
+        .organic-line {
+            stroke: var(--primary-stroke);
+            stroke-width: var(--line-weight);
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            animation: organicFlow 6s ease-in-out infinite;
+            filter: url(#roughPaper);
+        }
+
+        .network-node {
+            fill: none;
+            stroke: var(--primary-stroke);
+            stroke-width: var(--line-weight);
+            transform-origin: center;
+            animation: nodeOscillation 5s ease-in-out infinite;
+            filter: url(#roughPaper);
+        }
+
+        .curved-connection {
+            stroke: var(--primary-stroke);
+            stroke-width: var(--line-weight);
+            fill: none;
+            animation: curveDistortion 7s ease-in-out infinite;
+            filter: url(#roughPaper);
+        }
+
+        .motion-streak {
+            stroke: var(--primary-stroke);
+            stroke-width: 3px;
+            fill: none;
+            opacity: 0.8;
+            animation: streakMotion 2s infinite ease-out;
+            filter: url(#motionBlur) url(#roughPaper);
+        }
+
+        .glitch-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            mix-blend-mode: difference;
+            opacity: 0;
+            animation: realityGlitch 8s infinite;
+        }
+
+        /* Reality Distortion Animations */
+        @keyframes titleReality {
+            0%, 85%, 100% { 
+                transform: translate(0, 0) scale(1);
+                filter: hue-rotate(0deg);
+                text-shadow: none;
+            }
+            87% { 
+                transform: translate(-3px, 2px) scale(1.02);
+                filter: hue-rotate(180deg);
+                text-shadow: 2px 0 var(--glitch-red), -2px 0 var(--glitch-cyan);
+            }
+            89% { 
+                transform: translate(2px, -1px) scale(0.98);
+                filter: hue-rotate(270deg);
+                text-shadow: -1px 0 var(--glitch-yellow);
+            }
+            91% { 
+                transform: translate(-1px, 3px) scale(1.01);
+                filter: hue-rotate(90deg);
+            }
+        }
+
+        @keyframes protocolFlicker {
+            0%, 94%, 100% { opacity: 0.6; transform: translateY(0); }
+            95% { opacity: 0.1; transform: translateY(2px); }
+            96% { opacity: 0.9; transform: translateY(-1px); }
+            97% { opacity: 0.3; transform: translateY(1px); }
+            98% { opacity: 0.8; transform: translateY(0); }
+        }
+
+        @keyframes organicFlow {
+            0%, 100% { 
+                stroke-dasharray: none;
+                stroke-opacity: 1;
+                transform: translate(0, 0);
+            }
+            25% { 
+                stroke-dasharray: 2,1;
+                transform: translate(0.5px, -0.3px);
+            }
+            50% { 
+                stroke-opacity: 0.8;
+                transform: translate(-0.3px, 0.5px);
+            }
+            75% { 
+                stroke-dasharray: 1,2;
+                transform: translate(0.2px, 0.2px);
+            }
+        }
+
+        @keyframes nodeOscillation {
+            0%, 100% { 
+                transform: translate(0, 0) scale(1);
+                stroke-opacity: 1;
+            }
+            20% { 
+                transform: translate(0.8px, -0.5px) scale(1.05);
+            }
+            40% { 
+                transform: translate(-0.5px, 0.8px) scale(0.95);
+                stroke-opacity: 0.9;
+            }
+            60% { 
+                transform: translate(0.3px, 0.3px) scale(1.02);
+            }
+            80% { 
+                transform: translate(-0.3px, -0.2px) scale(0.98);
+            }
+        }
+
+        @keyframes curveDistortion {
+            0%, 100% { 
+                d: path("M 0,0 Q 10,5 20,0");
+                stroke-opacity: 1;
+            }
+            33% { 
+                stroke-opacity: 0.7;
+            }
+            66% { 
+                stroke-opacity: 0.9;
+            }
+        }
+
+        @keyframes streakMotion {
+            0% { 
+                stroke-dasharray: 0, 100;
+                stroke-dashoffset: 0;
+                opacity: 0;
+            }
+            20% { 
+                opacity: 0.8;
+                stroke-dasharray: 15, 5;
+            }
+            80% { 
+                stroke-dasharray: 20, 80;
+                stroke-dashoffset: -50;
+                opacity: 0.6;
+            }
+            100% { 
+                stroke-dasharray: 0, 100;
+                stroke-dashoffset: -100;
+                opacity: 0;
+            }
+        }
+
+        @keyframes realityGlitch {
+            0%, 96%, 100% { opacity: 0; }
+            97% { opacity: 0.05; }
+            98% { opacity: 0.15; }
+            99% { opacity: 0.03; }
+        }
+
+        @keyframes dataCorruption {
+            0%, 90%, 100% { 
+                opacity: 0.4;
+                transform: translateX(0);
+            }
+            92% { 
+                opacity: 0.1;
+                transform: translateX(2px);
+            }
+            94% { 
+                opacity: 0.7;
+                transform: translateX(-1px);
+            }
+            96% { 
+                opacity: 0.2;
+                transform: translateX(1px);
+            }
+        }
+
+        /* Interactive Reality Distortion */
+        .reality-container:hover .dimension-field {
+            animation: dimensionShift 3s infinite;
+        }
+
+        @keyframes dimensionShift {
+            0%, 100% { transform: perspective(1000px) rotateY(0deg) rotateX(0deg); }
+            25% { transform: perspective(1000px) rotateY(2deg) rotateX(1deg); }
+            50% { transform: perspective(1000px) rotateY(-1deg) rotateX(-2deg); }
+            75% { transform: perspective(1000px) rotateY(1deg) rotateX(1deg); }
+        }
+
+        /* Performance Optimizations */
+        .network-canvas,
+        .glitch-layer,
+        .dimension-field {
+            will-change: transform;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 768px) {
+            .main-title { font-size: 2rem; }
+            .dimension-field { width: 85vmin; height: 85vmin; }
+            :root { --line-weight: 1.5px; --node-radius: 5px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="reality-container">
+        <header class="temporal-header">
+            <h1 class="main-title">NEXUS_PROTOCOL</h1>
+            <div class="sub-protocol">// dimensional_network_interface.exe //</div>
+        </header>
+
+        <main class="dimension-field">
+            <svg class="network-canvas" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- Motion Blur Filter -->
+                    <filter id="motionBlur" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="3,0.5"/>
+                        <feOffset dx="8" dy="0"/>
+                    </filter>
+
+                    <!-- Rough Paper Texture -->
+                    <filter id="roughPaper">
+                        <feTurbulence baseFrequency="0.04" numOctaves="3" result="noise"/>
+                        <feDisplacementMap in="SourceGraphic" in2="noise" scale="0.8"/>
+                    </filter>
+
+                    <!-- Glitch Displacement -->
+                    <filter id="glitchDisplace">
+                        <feTurbulence baseFrequency="0.02" numOctaves="1" result="turbulence"/>
+                        <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="2">
+                            <animate attributeName="scale" values="0;3;0" dur="0.1s" repeatCount="indefinite"/>
+                        </feDisplacementMap>
+                    </filter>
+                </defs>
+
+                <!-- 3D Cube Framework with Accurate Perspective -->
+                <g class="cube-structure">
+                    <!-- Front face -->
+                    <line class="organic-line" x1="140" y1="120" x2="240" y2="120" style="animation-delay: 0s"/>
+                    <line class="organic-line" x1="240" y1="120" x2="240" y2="200" style="animation-delay: 0.2s"/>
+                    <line class="organic-line" x1="240" y1="200" x2="140" y2="200" style="animation-delay: 0.4s"/>
+                    <line class="organic-line" x1="140" y1="200" x2="140" y2="120" style="animation-delay: 0.6s"/>
+                    
+                    <!-- Back face (perspective) -->
+                    <line class="organic-line" x1="180" y1="80" x2="280" y2="80" style="animation-delay: 0.8s"/>
+                    <line class="organic-line" x1="280" y1="80" x2="280" y2="160" style="animation-delay: 1s"/>
+                    <line class="organic-line" x1="280" y1="160" x2="180" y2="160" style="animation-delay: 1.2s"/>
+                    <line class="organic-line" x1="180" y1="160" x2="180" y2="80" style="animation-delay: 1.4s"/>
+                    
+                    <!-- Depth connections -->
+                    <line class="organic-line" x1="140" y1="120" x2="180" y2="80" style="animation-delay: 1.6s"/>
+                    <line class="organic-line" x1="240" y1="120" x2="280" y2="80" style="animation-delay: 1.8s"/>
+                    <line class="organic-line" x1="240" y1="200" x2="280" y2="160" style="animation-delay: 2s"/>
+                    <line class="organic-line" x1="140" y1="200" x2="180" y2="160" style="animation-delay: 2.2s"/>
+                </g>
+
+                <!-- Curved Organic Connections -->
+                <g class="organic-connections">
+                    <path class="curved-connection" d="M 140,120 Q 80,60 50,40" style="animation-delay: 0.5s"/>
+                    <path class="curved-connection" d="M 240,120 Q 320,60 360,40" style="animation-delay: 1s"/>
+                    <path class="curved-connection" d="M 180,80 Q 120,30 90,10" style="animation-delay: 1.5s"/>
+                    <path class="curved-connection" d="M 280,160 Q 340,140 380,130" style="animation-delay: 2s"/>
+                    <path class="curved-connection" d="M 140,200 Q 80,260 50,300" style="animation-delay: 2.5s"/>
+                    <path class="curved-connection" d="M 180,160 Q 120,190 70,220" style="animation-delay: 3s"/>
+                    
+                    <!-- Large elliptical connection -->
+                    <ellipse class="curved-connection" cx="210" cy="140" rx="60" ry="35" style="animation-delay: 3.5s"/>
+                </g>
+
+                <!-- Network Nodes -->
+                <g class="node-network">
+                    <!-- Cube vertices -->
+                    <circle class="network-node" cx="140" cy="120" r="6" style="animation-delay: 0s"/>
+                    <circle class="network-node" cx="240" cy="120" r="6" style="animation-delay: 0.3s"/>
+                    <circle class="network-node" cx="240" cy="200" r="6" style="animation-delay: 0.6s"/>
+                    <circle class="network-node" cx="140" cy="200" r="6" style="animation-delay: 0.9s"/>
+                    <circle class="network-node" cx="180" cy="80" r="6" style="animation-delay: 1.2s"/>
+                    <circle class="network-node" cx="280" cy="80" r="6" style="animation-delay: 1.5s"/>
+                    <circle class="network-node" cx="280" cy="160" r="6" style="animation-delay: 1.8s"/>
+                    <circle class="network-node" cx="180" cy="160" r="6" style="animation-delay: 2.1s"/>
+                    
+                    <!-- Extended nodes -->
+                    <circle class="network-node" cx="50" cy="40" r="5" style="animation-delay: 2.4s"/>
+                    <circle class="network-node" cx="360" cy="40" r="5" style="animation-delay: 2.7s"/>
+                    <circle class="network-node" cx="90" cy="10" r="5" style="animation-delay: 3s"/>
+                    <circle class="network-node" cx="380" cy="130" r="5" style="animation-delay: 3.3s"/>
+                    <circle class="network-node" cx="50" cy="300" r="5" style="animation-delay: 3.6s"/>
+                    <circle class="network-node" cx="70" cy="220" r="5" style="animation-delay: 3.9s"/>
+                    
+                    <!-- Bottom connections -->
+                    <circle class="network-node" cx="190" cy="280" r="5" style="animation-delay: 4.2s"/>
+                    <circle class="network-node" cx="250" cy="280" r="5" style="animation-delay: 4.5s"/>
+                </g>
+
+                <!-- Motion Streak Effect -->
+                <g class="velocity-trails">
+                    <path class="motion-streak" d="M 320,280 L 350,275 L 370,273 L 385,270" style="animation-delay: 0s"/>
+                    <path class="motion-streak" d="M 325,285 L 355,280 L 375,278 L 390,275" style="animation-delay: 0.1s"/>
+                    <path class="motion-streak" d="M 315,275 L 345,270 L 365,268 L 380,265" style="animation-delay: 0.2s"/>
+                    
+                    <!-- Primary motion node -->
+                    <circle class="network-node motion-streak" cx="320" cy="280" r="7" style="animation-delay: 0s"/>
+                </g>
+
+                <!-- Additional connecting lines -->
+                <g class="extended-network">
+                    <line class="organic-line" x1="140" y1="200" x2="190" y2="280" style="animation-delay: 4.8s"/>
+                    <line class="organic-line" x1="240" y1="200" x2="250" y2="280" style="animation-delay: 5.1s"/>
+                    <line class="organic-line" x1="250" y1="280" x2="320" y2="280" style="animation-delay: 5.4s"/>
+                </g>
+            </svg>
+
+            <!-- Reality Glitch Overlays -->
+            <div class="glitch-layer" style="background: linear-gradient(45deg, var(--glitch-red) 0%, transparent 50%);"></div>
+            <div class="glitch-layer" style="background: linear-gradient(-45deg, var(--glitch-cyan) 0%, transparent 50%); animation-delay: 2s;"></div>
+            <div class="glitch-layer" style="background: radial-gradient(circle, var(--glitch-yellow) 0%, transparent 70%); animation-delay: 4s;"></div>
+        </main>
+
+        <footer class="temporal-footer">
+            <div>// reality.buffer_overflow // temporal_displacement_active //</div>
+            <div>// network_integrity: 73.2% // dimension_stable: false //</div>
+        </footer>
+    </div>
+
+    <script>
+        class TemporalDisplacementEngine {
+            constructor() {
+                this.nodes = document.querySelectorAll('.network-node');
+                this.connections = document.querySelectorAll('.organic-line, .curved-connection');
+                this.canvas = document.querySelector('.network-canvas');
+                this.glitchLayers = document.querySelectorAll('.glitch-layer');
+                
+                this.initializeReality();
+                this.bindDimensionalEvents();
+            }
+
+            initializeReality() {
+                // Staggered initialization for temporal effect
+                this.nodes.forEach((node, index) => {
+                    setTimeout(() => {
+                        node.style.opacity = '1';
+                        node.style.transform = 'scale(1)';
+                    }, index * 150);
+                });
+            }
+
+            bindDimensionalEvents() {
+                // Mouse-driven reality distortion
+                document.addEventListener('mousemove', (e) => {
+                    const mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+                    const mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+                    
+                    // Parallax displacement
+                    this.canvas.style.transform = `
+                        translate(${mouseX * 8}px, ${mouseY * 8}px) 
+                        scale(${1 + Math.abs(mouseX) * 0.03})
+                        rotateZ(${mouseX * 0.5}deg)
+                    `;
+                    
+                    // Dynamic glitch intensity
+                    const intensity = Math.abs(mouseX) + Math.abs(mouseY);
+                    document.documentElement.style.setProperty('--glitch-intensity', intensity);
+                });
+
+                // Temporal glitch bursts
+                setInterval(() => {
+                    this.triggerTemporalGlitch();
+                }, 4000 + Math.random() * 6000);
+
+                // Performance optimization for mobile
+                if (window.innerWidth < 768 || navigator.hardwareConcurrency < 4) {
+                    this.optimizeForLowEnd();
+                }
+            }
+
+            triggerTemporalGlitch() {
+                const randomNodes = Array.from(this.nodes)
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 3);
+
+                randomNodes.forEach((node, index) => {
+                    setTimeout(() => {
+                        node.style.filter = 'url(#glitchDisplace)';
+                        node.style.stroke = `var(--glitch-${['red', 'cyan', 'yellow'][index % 3]})`;
+                        
+                        setTimeout(() => {
+                            node.style.filter = 'url(#roughPaper)';
+                            node.style.stroke = 'var(--primary-stroke)';
+                        }, 200);
+                    }, index * 50);
+                });
+            }
+
+            optimizeForLowEnd() {
+                // Reduce animation complexity
+                this.connections.forEach(conn => {
+                    if (!conn.classList.contains('motion-streak')) {
+                        conn.style.animation = 'none';
+                    }
+                });
+                
+                // Simplify glitch effects
+                this.glitchLayers.forEach(layer => {
+                    layer.style.display = 'none';
+                });
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new TemporalDisplacementEngine();
+        });
+
+        // Reality stability monitoring
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+            console.log('// TEMPORAL_DISPLACEMENT_ENGINE: ACTIVE //');
+            console.log('// REALITY_BUFFER: STABLE //');
+            console.log('// DIMENSIONAL_INTEGRITY: 73.2% //');
+        });
+    </script>
+</body>
+</html>
