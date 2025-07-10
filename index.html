@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Temporal Displacement Field</title>
+    <title>tidstemporal</title>
     <style>
         * {
             margin: 0;
@@ -12,26 +12,31 @@
         }
 
         :root {
-            --bg-color: #f4f1e8;
-            --primary-stroke: #1a1a1a;
-            --glitch-red: #ff3366;
-            --glitch-cyan: #33ffaa;
-            --glitch-yellow: #ffaa33;
-            --node-radius: 6px;
-            --line-weight: 1.8px;
-            --hand-variation: 0.5px;
+            --bg-primary: #f4f1e8;
+            --ink-primary: #1a1a1a;
+            --ink-secondary: #2d2d2d;
+            --ink-tertiary: #404040;
+            --glitch-red: #ff34b8;
+            --glitch-cyan: #0dffd7;
+            --glitch-amber: #ffa659;
+            --glitch-violet: #a069ff;
+            --base-line-weight: 1.6px;
+            --node-base-size: 5px;
+            --organic-variation: 2px;
+            --temporal-speed: 1;
         }
 
         body {
-            background: var(--bg-color);
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            background: var(--bg-primary);
+            font-family: 'JetBrains Mono', 'SF Mono', 'Monaco', monospace;
             overflow: hidden;
             height: 100vh;
-            color: var(--primary-stroke);
+            color: var(--ink-primary);
             cursor: crosshair;
+            user-select: none;
         }
 
-        .reality-container {
+        .quantum-container {
             position: relative;
             width: 100vw;
             height: 100vh;
@@ -39,486 +44,813 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            will-change: transform;
         }
 
-        .temporal-header {
+        .interface-header {
             position: absolute;
-            top: 5vh;
+            top: 4vh;
             text-align: center;
             z-index: 100;
             will-change: transform;
         }
 
-        .main-title {
-            font-size: clamp(1.5rem, 4vw, 3.5rem);
-            font-weight: 100;
-            letter-spacing: 0.3em;
-            margin-bottom: 0.5rem;
-            animation: titleReality 12s infinite;
+        .primary-title {
+            font-size: clamp(1.2rem, 3.5vw, 2.8rem);
+            font-weight: 200;
+            letter-spacing: 0.25em;
+            margin-bottom: 0.3rem;
+            animation: quantumFlicker 15s infinite;
             text-transform: uppercase;
+            opacity: 0.9;
         }
 
-        .sub-protocol {
-            font-size: clamp(0.7rem, 1.5vw, 1rem);
-            opacity: 0.6;
-            letter-spacing: 0.1em;
-            animation: protocolFlicker 8s infinite;
+        .system-status {
+            font-size: clamp(0.6rem, 1.2vw, 0.85rem);
+            opacity: 0.5;
+            letter-spacing: 0.08em;
+            animation: statusPulse 8s infinite;
+            font-weight: 300;
         }
 
-        .dimension-field {
+        .generative-field {
             position: relative;
-            width: 70vmin;
-            height: 70vmin;
-            max-width: 600px;
-            max-height: 600px;
+            width: 75vmin;
+            height: 75vmin;
+            max-width: 650px;
+            max-height: 650px;
         }
 
-        .network-canvas {
+        .neural-canvas {
             width: 100%;
             height: 100%;
-            filter: drop-shadow(0 0 2px rgba(26, 26, 26, 0.15));
+            filter: drop-shadow(0 0 1px rgba(26, 26, 26, 0.1));
             will-change: transform;
+            transform-style: preserve-3d;
         }
 
-        .temporal-footer {
+        .system-footer {
             position: absolute;
-            bottom: 5vh;
+            bottom: 4vh;
             text-align: center;
-            font-size: 0.7rem;
-            opacity: 0.4;
-            letter-spacing: 0.05em;
-            animation: dataCorruption 15s infinite;
+            font-size: 0.65rem;
+            opacity: 0.35;
+            letter-spacing: 0.04em;
+            animation: systemGlitch 20s infinite;
+            font-weight: 300;
         }
 
-        /* Advanced Hand-drawn Effects */
-        .organic-line {
-            stroke: var(--primary-stroke);
-            stroke-width: var(--line-weight);
+        /* Enhanced Organic Line System */
+        .organic-connection {
+            stroke: var(--ink-primary);
+            stroke-width: var(--base-line-weight);
             fill: none;
             stroke-linecap: round;
             stroke-linejoin: round;
-            animation: organicFlow 6s ease-in-out infinite;
-            filter: url(#roughPaper);
+            animation: organicEvolution 8s ease-in-out infinite;
+            filter: url(#organicTexture);
+            will-change: transform, stroke-width, stroke-dasharray;
         }
 
-        .network-node {
+        .generative-node {
             fill: none;
-            stroke: var(--primary-stroke);
-            stroke-width: var(--line-weight);
+            stroke: var(--ink-primary);
+            stroke-width: var(--base-line-weight);
             transform-origin: center;
-            animation: nodeOscillation 5s ease-in-out infinite;
-            filter: url(#roughPaper);
+            animation: nodeBreathing 6s ease-in-out infinite;
+            filter: url(#organicTexture);
+            will-change: transform, stroke-width;
         }
 
-        .curved-connection {
-            stroke: var(--primary-stroke);
-            stroke-width: var(--line-weight);
+        .curved-flow {
+            stroke: var(--ink-primary);
+            stroke-width: var(--base-line-weight);
             fill: none;
-            animation: curveDistortion 7s ease-in-out infinite;
-            filter: url(#roughPaper);
+            animation: pathMorphing 12s ease-in-out infinite;
+            filter: url(#organicTexture);
+            will-change: d, stroke-width;
         }
 
-        .motion-streak {
-            stroke: var(--primary-stroke);
-            stroke-width: 3px;
+        .velocity-trail {
+            stroke: var(--ink-primary);
+            stroke-width: calc(var(--base-line-weight) * 1.5);
             fill: none;
-            opacity: 0.8;
-            animation: streakMotion 2s infinite ease-out;
-            filter: url(#motionBlur) url(#roughPaper);
+            opacity: 0.7;
+            animation: velocityFlow 3s ease-out infinite;
+            filter: url(#velocityBlur) url(#organicTexture);
+            will-change: transform, opacity, stroke-dasharray;
         }
 
-        .glitch-layer {
+        .dimensional-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            mix-blend-mode: difference;
+            mix-blend-mode: color-dodge;
             opacity: 0;
-            animation: realityGlitch 8s infinite;
+            animation: dimensionalShift 12s infinite;
         }
 
-        /* Reality Distortion Animations */
-        @keyframes titleReality {
-            0%, 85%, 100% { 
+        /* Advanced Animation System */
+        @keyframes quantumFlicker {
+            0%, 92%, 100% { 
                 transform: translate(0, 0) scale(1);
-                filter: hue-rotate(0deg);
+                filter: hue-rotate(0deg) brightness(1);
                 text-shadow: none;
             }
-            87% { 
-                transform: translate(-3px, 2px) scale(1.02);
-                filter: hue-rotate(180deg);
-                text-shadow: 2px 0 var(--glitch-red), -2px 0 var(--glitch-cyan);
+            93% { 
+                transform: translate(-1px, 0.5px) scale(1.008);
+                filter: hue-rotate(45deg) brightness(1.1);
+                text-shadow: 1px 0 var(--glitch-cyan);
             }
-            89% { 
-                transform: translate(2px, -1px) scale(0.98);
-                filter: hue-rotate(270deg);
-                text-shadow: -1px 0 var(--glitch-yellow);
+            94% { 
+                transform: translate(0.5px, -0.5px) scale(0.998);
+                filter: hue-rotate(180deg) brightness(0.9);
+                text-shadow: -0.5px 0 var(--glitch-red);
             }
-            91% { 
-                transform: translate(-1px, 3px) scale(1.01);
-                filter: hue-rotate(90deg);
+            95% { 
+                transform: translate(-0.5px, 1px) scale(1.004);
+                filter: hue-rotate(270deg) brightness(1.05);
+                text-shadow: 0.5px 0 var(--glitch-amber);
             }
         }
 
-        @keyframes protocolFlicker {
-            0%, 94%, 100% { opacity: 0.6; transform: translateY(0); }
-            95% { opacity: 0.1; transform: translateY(2px); }
-            96% { opacity: 0.9; transform: translateY(-1px); }
-            97% { opacity: 0.3; transform: translateY(1px); }
-            98% { opacity: 0.8; transform: translateY(0); }
+        @keyframes statusPulse {
+            0%, 100% { opacity: 0.5; transform: translateY(0); }
+            30% { opacity: 0.3; transform: translateY(0.5px); }
+            60% { opacity: 0.7; transform: translateY(-0.3px); }
+            85% { opacity: 0.4; transform: translateY(0.2px); }
         }
 
-        @keyframes organicFlow {
+        @keyframes organicEvolution {
             0%, 100% { 
                 stroke-dasharray: none;
-                stroke-opacity: 1;
+                stroke-width: var(--base-line-weight);
                 transform: translate(0, 0);
+                stroke-opacity: 1;
             }
-            25% { 
-                stroke-dasharray: 2,1;
-                transform: translate(0.5px, -0.3px);
+            15% { 
+                stroke-dasharray: 3,1,1,1;
+                transform: translate(0.3px, -0.2px);
+                stroke-width: calc(var(--base-line-weight) * 1.1);
             }
-            50% { 
-                stroke-opacity: 0.8;
-                transform: translate(-0.3px, 0.5px);
+            35% { 
+                stroke-opacity: 0.85;
+                transform: translate(-0.2px, 0.4px);
+                stroke-width: calc(var(--base-line-weight) * 0.9);
+            }
+            55% { 
+                stroke-dasharray: 2,2,1,1;
+                transform: translate(0.4px, 0.1px);
+                stroke-width: calc(var(--base-line-weight) * 1.05);
             }
             75% { 
-                stroke-dasharray: 1,2;
-                transform: translate(0.2px, 0.2px);
+                stroke-opacity: 0.95;
+                transform: translate(-0.1px, -0.3px);
+                stroke-width: calc(var(--base-line-weight) * 0.95);
             }
         }
 
-        @keyframes nodeOscillation {
+        @keyframes nodeBreathing {
             0%, 100% { 
                 transform: translate(0, 0) scale(1);
+                stroke-width: var(--base-line-weight);
+                stroke-opacity: 1;
+            }
+            25% { 
+                transform: translate(0.4px, -0.3px) scale(1.08);
+                stroke-width: calc(var(--base-line-weight) * 1.15);
+            }
+            50% { 
+                transform: translate(-0.3px, 0.5px) scale(0.92);
+                stroke-width: calc(var(--base-line-weight) * 0.85);
+                stroke-opacity: 0.9;
+            }
+            75% { 
+                transform: translate(0.2px, 0.2px) scale(1.04);
+                stroke-width: calc(var(--base-line-weight) * 1.05);
+            }
+        }
+
+        @keyframes pathMorphing {
+            0%, 100% { 
+                stroke-width: var(--base-line-weight);
                 stroke-opacity: 1;
             }
             20% { 
-                transform: translate(0.8px, -0.5px) scale(1.05);
+                stroke-width: calc(var(--base-line-weight) * 0.8);
+                stroke-opacity: 0.7;
             }
             40% { 
-                transform: translate(-0.5px, 0.8px) scale(0.95);
+                stroke-width: calc(var(--base-line-weight) * 1.2);
                 stroke-opacity: 0.9;
             }
             60% { 
-                transform: translate(0.3px, 0.3px) scale(1.02);
+                stroke-width: calc(var(--base-line-weight) * 0.9);
+                stroke-opacity: 0.8;
             }
             80% { 
-                transform: translate(-0.3px, -0.2px) scale(0.98);
+                stroke-width: calc(var(--base-line-weight) * 1.1);
+                stroke-opacity: 0.95;
             }
         }
 
-        @keyframes curveDistortion {
-            0%, 100% { 
-                d: path("M 0,0 Q 10,5 20,0");
-                stroke-opacity: 1;
-            }
-            33% { 
-                stroke-opacity: 0.7;
-            }
-            66% { 
-                stroke-opacity: 0.9;
-            }
-        }
-
-        @keyframes streakMotion {
+        @keyframes velocityFlow {
             0% { 
-                stroke-dasharray: 0, 100;
+                stroke-dasharray: 0, 150;
                 stroke-dashoffset: 0;
                 opacity: 0;
+                transform: translateX(0) scale(1);
             }
-            20% { 
+            15% { 
+                opacity: 0.7;
+                stroke-dasharray: 12, 8;
+                transform: translateX(1px) scale(1.02);
+            }
+            35% {
+                stroke-dasharray: 18, 12;
+                stroke-dashoffset: -20;
                 opacity: 0.8;
-                stroke-dasharray: 15, 5;
+                transform: translateX(2px) scale(1.05);
             }
-            80% { 
-                stroke-dasharray: 20, 80;
-                stroke-dashoffset: -50;
+            65% { 
+                stroke-dasharray: 25, 25;
+                stroke-dashoffset: -45;
                 opacity: 0.6;
+                transform: translateX(4px) scale(1.08);
+            }
+            85% {
+                stroke-dasharray: 30, 120;
+                stroke-dashoffset: -80;
+                opacity: 0.3;
+                transform: translateX(6px) scale(1.1);
             }
             100% { 
-                stroke-dasharray: 0, 100;
-                stroke-dashoffset: -100;
+                stroke-dasharray: 0, 150;
+                stroke-dashoffset: -150;
                 opacity: 0;
+                transform: translateX(8px) scale(1.12);
             }
         }
 
-        @keyframes realityGlitch {
-            0%, 96%, 100% { opacity: 0; }
-            97% { opacity: 0.05; }
-            98% { opacity: 0.15; }
-            99% { opacity: 0.03; }
+        @keyframes dimensionalShift {
+            0%, 97%, 100% { opacity: 0; }
+            98% { opacity: 0.03; }
+            99% { opacity: 0.08; }
         }
 
-        @keyframes dataCorruption {
-            0%, 90%, 100% { 
-                opacity: 0.4;
+        @keyframes systemGlitch {
+            0%, 95%, 100% { 
+                opacity: 0.35;
                 transform: translateX(0);
-            }
-            92% { 
-                opacity: 0.1;
-                transform: translateX(2px);
-            }
-            94% { 
-                opacity: 0.7;
-                transform: translateX(-1px);
+                filter: none;
             }
             96% { 
-                opacity: 0.2;
+                opacity: 0.1;
                 transform: translateX(1px);
+                filter: hue-rotate(90deg);
+            }
+            97% { 
+                opacity: 0.6;
+                transform: translateX(-0.5px);
+                filter: hue-rotate(180deg);
+            }
+            98% { 
+                opacity: 0.2;
+                transform: translateX(0.5px);
+                filter: hue-rotate(270deg);
             }
         }
 
-        /* Interactive Reality Distortion */
-        .reality-container:hover .dimension-field {
-            animation: dimensionShift 3s infinite;
+        /* Interactive Enhancement */
+        .quantum-container:hover .generative-field {
+            animation: fieldDistortion 4s infinite;
         }
 
-        @keyframes dimensionShift {
-            0%, 100% { transform: perspective(1000px) rotateY(0deg) rotateX(0deg); }
-            25% { transform: perspective(1000px) rotateY(2deg) rotateX(1deg); }
-            50% { transform: perspective(1000px) rotateY(-1deg) rotateX(-2deg); }
-            75% { transform: perspective(1000px) rotateY(1deg) rotateX(1deg); }
+        @keyframes fieldDistortion {
+            0%, 100% { 
+                transform: perspective(1200px) rotateY(0deg) rotateX(0deg) rotateZ(0deg);
+                filter: none;
+            }
+            25% { 
+                transform: perspective(1200px) rotateY(1.5deg) rotateX(0.8deg) rotateZ(0.2deg);
+                filter: brightness(1.02);
+            }
+            50% { 
+                transform: perspective(1200px) rotateY(-0.8deg) rotateX(-1.2deg) rotateZ(-0.1deg);
+                filter: brightness(0.98);
+            }
+            75% { 
+                transform: perspective(1200px) rotateY(0.6deg) rotateX(0.4deg) rotateZ(0.15deg);
+                filter: brightness(1.01);
+            }
         }
 
         /* Performance Optimizations */
-        .network-canvas,
-        .glitch-layer,
-        .dimension-field {
+        .neural-canvas,
+        .dimensional-overlay,
+        .generative-field {
             will-change: transform;
             backface-visibility: hidden;
             transform-style: preserve-3d;
+            contain: layout style paint;
         }
 
-        /* Responsive Breakpoints */
+        /* Responsive Optimizations */
         @media (max-width: 768px) {
-            .main-title { font-size: 2rem; }
-            .dimension-field { width: 85vmin; height: 85vmin; }
-            :root { --line-weight: 1.5px; --node-radius: 5px; }
+            .primary-title { font-size: 1.8rem; }
+            .generative-field { width: 90vmin; height: 90vmin; }
+            :root { 
+                --base-line-weight: 1.4px; 
+                --node-base-size: 4px; 
+                --organic-variation: 1.5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            :root { 
+                --base-line-weight: 1.2px; 
+                --node-base-size: 3.5px;
+                --temporal-speed: 0.7;
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            * { animation-duration: 0.01ms !important; }
+            * { 
+                animation-duration: 0.01ms !important; 
+                animation-iteration-count: 1 !important;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="reality-container">
-        <header class="temporal-header">
-            <h1 class="main-title">NEXUS_PROTOCOL</h1>
-            <div class="sub-protocol">// dimensional_network_interface.exe //</div>
+    <div class="quantum-container" id="quantumField">
+        <header class="interface-header">
+            <h1 class="primary-title">Mute// plotinus_island.log.vis</h1>
+            <div class="system-status">//degrad-pltin-protokollen.v2.1 //</div>
         </header>
 
-        <main class="dimension-field">
-            <svg class="network-canvas" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        <main class="generative-field" id="generativeField">
+            <svg class="neural-canvas" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" id="neuralCanvas">
                 <defs>
-                    <!-- Motion Blur Filter -->
-                    <filter id="motionBlur" x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur in="SourceGraphic" stdDeviation="3,0.5"/>
-                        <feOffset dx="8" dy="0"/>
+                    <!-- Enhanced Organic Texture Filter -->
+                    <filter id="organicTexture" x="-20%" y="-20%" width="140%" height="140%">
+                        <feTurbulence baseFrequency="0.6,0.4" numOctaves="4" result="turbulence" seed="2">
+                            <animate attributeName="seed" values="2;5;8;2" dur="20s" repeatCount="indefinite"/>
+                        </feTurbulence>
+                        <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="0.4"/>
+                        <feGaussianBlur stdDeviation="0.2"/>
                     </filter>
 
-                    <!-- Rough Paper Texture -->
-                    <filter id="roughPaper">
-                        <feTurbulence baseFrequency="0.04" numOctaves="3" result="noise"/>
-                        <feDisplacementMap in="SourceGraphic" in2="noise" scale="0.8"/>
+                    <!-- Enhanced Velocity Blur -->
+                    <filter id="velocityBlur" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="2.5,0.3"/>
+                        <feOffset dx="5" dy="0">
+                            <animate attributeName="dx" values="5;8;5" dur="1.5s" repeatCount="indefinite"/>
+                        </feOffset>
                     </filter>
 
-                    <!-- Glitch Displacement -->
-                    <filter id="glitchDisplace">
-                        <feTurbulence baseFrequency="0.02" numOctaves="1" result="turbulence"/>
-                        <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="2">
-                            <animate attributeName="scale" values="0;3;0" dur="0.1s" repeatCount="indefinite"/>
+                    <!-- Advanced Glitch Displacement -->
+                    <filter id="quantumGlitch" x="-30%" y="-30%" width="160%" height="160%">
+                        <feTurbulence baseFrequency="0.9" numOctaves="2" result="glitchNoise">
+                            <animate attributeName="baseFrequency" values="0.9;1.5;0.9" dur="0.3s" repeatCount="indefinite"/>
+                        </feTurbulence>
+                        <feDisplacementMap in="SourceGraphic" in2="glitchNoise" scale="0">
+                            <animate attributeName="scale" values="0;0;0;3;0;0;0" dur="8s" repeatCount="indefinite"/>
                         </feDisplacementMap>
                     </filter>
+
+                    <!-- Procedural Pattern Generation -->
+                    <pattern id="organicPattern" patternUnits="userSpaceOnUse" width="28" height="8">
+                        <circle cx="4" cy="4" r="0.5" fill="none" stroke="var(--ink-primary)" stroke-width="0.2" opacity="0.3"/>
+                    </pattern>
                 </defs>
 
-                <!-- 3D Cube Framework with Accurate Perspective -->
-                <g class="cube-structure">
-                    <!-- Front face -->
-                    <line class="organic-line" x1="140" y1="120" x2="240" y2="120" style="animation-delay: 0s"/>
-                    <line class="organic-line" x1="240" y1="120" x2="240" y2="200" style="animation-delay: 0.2s"/>
-                    <line class="organic-line" x1="240" y1="200" x2="140" y2="200" style="animation-delay: 0.4s"/>
-                    <line class="organic-line" x1="140" y1="200" x2="140" y2="120" style="animation-delay: 0.6s"/>
-                    
-                    <!-- Back face (perspective) -->
-                    <line class="organic-line" x1="180" y1="80" x2="280" y2="80" style="animation-delay: 0.8s"/>
-                    <line class="organic-line" x1="280" y1="80" x2="280" y2="160" style="animation-delay: 1s"/>
-                    <line class="organic-line" x1="280" y1="160" x2="180" y2="160" style="animation-delay: 1.2s"/>
-                    <line class="organic-line" x1="180" y1="160" x2="180" y2="80" style="animation-delay: 1.4s"/>
-                    
-                    <!-- Depth connections -->
-                    <line class="organic-line" x1="140" y1="120" x2="180" y2="80" style="animation-delay: 1.6s"/>
-                    <line class="organic-line" x1="240" y1="120" x2="280" y2="80" style="animation-delay: 1.8s"/>
-                    <line class="organic-line" x1="240" y1="200" x2="280" y2="160" style="animation-delay: 2s"/>
-                    <line class="organic-line" x1="140" y1="200" x2="180" y2="160" style="animation-delay: 2.2s"/>
+                <!-- Generative 3D Structure Container -->
+                <g id="structureContainer">
+                    <!-- This will be populated by JavaScript -->
                 </g>
 
-                <!-- Curved Organic Connections -->
-                <g class="organic-connections">
-                    <path class="curved-connection" d="M 140,120 Q 80,60 50,40" style="animation-delay: 0.5s"/>
-                    <path class="curved-connection" d="M 240,120 Q 320,60 360,40" style="animation-delay: 1s"/>
-                    <path class="curved-connection" d="M 180,80 Q 120,30 90,10" style="animation-delay: 1.5s"/>
-                    <path class="curved-connection" d="M 280,160 Q 340,140 380,130" style="animation-delay: 2s"/>
-                    <path class="curved-connection" d="M 140,200 Q 80,260 50,300" style="animation-delay: 2.5s"/>
-                    <path class="curved-connection" d="M 180,160 Q 120,190 70,220" style="animation-delay: 3s"/>
-                    
-                    <!-- Large elliptical connection -->
-                    <ellipse class="curved-connection" cx="210" cy="140" rx="60" ry="35" style="animation-delay: 3.5s"/>
+                <!-- Generative Organic Connections Container -->
+                <g id="connectionsContainer">
+                    <!-- This will be populated by JavaScript -->
                 </g>
 
-                <!-- Network Nodes -->
-                <g class="node-network">
-                    <!-- Cube vertices -->
-                    <circle class="network-node" cx="140" cy="120" r="6" style="animation-delay: 0s"/>
-                    <circle class="network-node" cx="240" cy="120" r="6" style="animation-delay: 0.3s"/>
-                    <circle class="network-node" cx="240" cy="200" r="6" style="animation-delay: 0.6s"/>
-                    <circle class="network-node" cx="140" cy="200" r="6" style="animation-delay: 0.9s"/>
-                    <circle class="network-node" cx="180" cy="80" r="6" style="animation-delay: 1.2s"/>
-                    <circle class="network-node" cx="280" cy="80" r="6" style="animation-delay: 1.5s"/>
-                    <circle class="network-node" cx="280" cy="160" r="6" style="animation-delay: 1.8s"/>
-                    <circle class="network-node" cx="180" cy="160" r="6" style="animation-delay: 2.1s"/>
-                    
-                    <!-- Extended nodes -->
-                    <circle class="network-node" cx="50" cy="40" r="5" style="animation-delay: 2.4s"/>
-                    <circle class="network-node" cx="360" cy="40" r="5" style="animation-delay: 2.7s"/>
-                    <circle class="network-node" cx="90" cy="10" r="5" style="animation-delay: 3s"/>
-                    <circle class="network-node" cx="380" cy="130" r="5" style="animation-delay: 3.3s"/>
-                    <circle class="network-node" cx="50" cy="300" r="5" style="animation-delay: 3.6s"/>
-                    <circle class="network-node" cx="70" cy="220" r="5" style="animation-delay: 3.9s"/>
-                    
-                    <!-- Bottom connections -->
-                    <circle class="network-node" cx="190" cy="280" r="5" style="animation-delay: 4.2s"/>
-                    <circle class="network-node" cx="250" cy="280" r="5" style="animation-delay: 4.5s"/>
+                <!-- Generative Node Network Container -->
+                <g id="nodeContainer">
+                    <!-- This will be populated by JavaScript -->
                 </g>
 
-                <!-- Motion Streak Effect -->
-                <g class="velocity-trails">
-                    <path class="motion-streak" d="M 320,280 L 350,275 L 370,273 L 385,270" style="animation-delay: 0s"/>
-                    <path class="motion-streak" d="M 325,285 L 355,280 L 375,278 L 390,275" style="animation-delay: 0.1s"/>
-                    <path class="motion-streak" d="M 315,275 L 345,270 L 365,268 L 380,265" style="animation-delay: 0.2s"/>
-                    
-                    <!-- Primary motion node -->
-                    <circle class="network-node motion-streak" cx="320" cy="280" r="7" style="animation-delay: 0s"/>
-                </g>
-
-                <!-- Additional connecting lines -->
-                <g class="extended-network">
-                    <line class="organic-line" x1="140" y1="200" x2="190" y2="280" style="animation-delay: 4.8s"/>
-                    <line class="organic-line" x1="240" y1="200" x2="250" y2="280" style="animation-delay: 5.1s"/>
-                    <line class="organic-line" x1="250" y1="280" x2="320" y2="280" style="animation-delay: 5.4s"/>
+                <!-- Velocity Trails Container -->
+                <g id="velocityContainer">
+                    <!-- This will be populated by JavaScript -->
                 </g>
             </svg>
 
-            <!-- Reality Glitch Overlays -->
-            <div class="glitch-layer" style="background: linear-gradient(45deg, var(--glitch-red) 0%, transparent 50%);"></div>
-            <div class="glitch-layer" style="background: linear-gradient(-45deg, var(--glitch-cyan) 0%, transparent 50%); animation-delay: 2s;"></div>
-            <div class="glitch-layer" style="background: radial-gradient(circle, var(--glitch-yellow) 0%, transparent 70%); animation-delay: 4s;"></div>
+            <!-- Enhanced Dimensional Overlays -->
+            <div class="dimensional-overlay" style="background: linear-gradient(45deg, var(--glitch-red) 0%, transparent 50%);"></div>
+            <div class="dimensional-overlay" style="background: linear-gradient(-45deg, var(--glitch-cyan) 0%, transparent 50%); animation-delay: 3s;"></div>
+            <div class="dimensional-overlay" style="background: radial-gradient(circle, var(--glitch-amber) 0%, transparent 70%); animation-delay: 6s;"></div>
+            <div class="dimensional-overlay" style="background: linear-gradient(90deg, var(--glitch-violet) 0%, transparent 60%); animation-delay: 9s;"></div>
         </main>
 
-        <footer class="temporal-footer">
-            <div>// reality.buffer_overflow // temporal_displacement_active //</div>
-            <div>// network_integrity: 73.2% // dimension_stable: false //</div>
+        <footer class="system-footer">
+            <div>// quantum.state_9kabel // temporal_kabel: variable //</div>
+            <div>// neural_støj-integrity: adaptive.muteisland // dimensional_variance: active //</div>
         </footer>
     </div>
 
     <script>
-        class TemporalDisplacementEngine {
+        class AdvancedGenerativeEngine {
             constructor() {
-                this.nodes = document.querySelectorAll('.network-node');
-                this.connections = document.querySelectorAll('.organic-line, .curved-connection');
-                this.canvas = document.querySelector('.network-canvas');
-                this.glitchLayers = document.querySelectorAll('.glitch-layer');
+                this.canvas = document.getElementById('neuralCanvas');
+                this.structureContainer = document.getElementById('structureContainer');
+                this.connectionsContainer = document.getElementById('connectionsContainer');
+                this.nodeContainer = document.getElementById('nodeContainer');
+                this.velocityContainer = document.getElementById('velocityContainer');
                 
-                this.initializeReality();
-                this.bindDimensionalEvents();
+                // Generative parameters
+                this.config = {
+                    cubeSize: 80,
+                    centerX: 200,
+                    centerY: 150,
+                    depth: 40,
+                    nodeCount: 16,
+                    connectionVariance: 0.3,
+                    organicFactor: 8,
+                    velocityTrails: 6
+                };
+
+                this.animationFrame = null;
+                this.time = 0;
+                this.performanceLevel = this.detectPerformanceLevel();
+                
+                this.initializeGenerativeStructure();
+                this.bindQuantumInteractions();
+                this.startTemporalLoop();
             }
 
-            initializeReality() {
-                // Staggered initialization for temporal effect
-                this.nodes.forEach((node, index) => {
-                    setTimeout(() => {
-                        node.style.opacity = '1';
-                        node.style.transform = 'scale(1)';
-                    }, index * 150);
+            detectPerformanceLevel() {
+                const cores = navigator.hardwareConcurrency || 4;
+                const memory = navigator.deviceMemory || 4;
+                const mobile = window.innerWidth < 768;
+                
+                if (mobile || cores < 4 || memory < 4) return 'low';
+                if (cores >= 8 && memory >= 8) return 'high';
+                return 'medium';
+            }
+
+            generateOrganicVariation(base, variance) {
+                return base + (Math.random() - 0.5) * variance * 2;
+            }
+
+            createCubicStructure() {
+                const { cubeSize, centerX, centerY, depth } = this.config;
+                const variance = this.config.organicFactor;
+                
+                // Generate 3D cube vertices with organic variation
+                const vertices = [
+                    // Front face
+                    [centerX - cubeSize/2, centerY - cubeSize/2, 0],
+                    [centerX + cubeSize/2, centerY - cubeSize/2, 0],
+                    [centerX + cubeSize/2, centerY + cubeSize/2, 0],
+                    [centerX - cubeSize/2, centerY + cubeSize/2, 0],
+                    // Back face
+                    [centerX - cubeSize/2 + depth, centerY - cubeSize/2 - depth, depth],
+                    [centerX + cubeSize/2 + depth, centerY - cubeSize/2 - depth, depth],
+                    [centerX + cubeSize/2 + depth, centerY + cubeSize/2 - depth, depth],
+                    [centerX - cubeSize/2 + depth, centerY + cubeSize/2 - depth, depth]
+                ];
+
+                // Apply organic variation
+                vertices.forEach(vertex => {
+                    vertex[0] = this.generateOrganicVariation(vertex[0], variance);
+                    vertex[1] = this.generateOrganicVariation(vertex[1], variance);
                 });
+
+                // Generate connections with enhanced organic variation
+                const connections = [
+                    // Front face
+                    [0, 1], [1, 2], [2, 3], [3, 0],
+                    // Back face  
+                    [4, 5], [5, 6], [6, 7], [7, 4],
+                    // Depth connections
+                    [0, 4], [1, 5], [2, 6], [3, 7]
+                ];
+
+                return { vertices, connections };
             }
 
-            bindDimensionalEvents() {
-                // Mouse-driven reality distortion
-                document.addEventListener('mousemove', (e) => {
-                    const mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-                    const mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+            generateOrganicCurves() {
+                const curves = [];
+                const { centerX, centerY, organicFactor } = this.config;
+                
+                // Generate multiple organic curves with mathematical variation
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    const radius = 120 + Math.sin(angle * 3) * 40;
+                    const variance = organicFactor * 2;
                     
-                    // Parallax displacement
+                    const startX = centerX + Math.cos(angle) * 60 + this.generateOrganicVariation(0, variance);
+                    const startY = centerY + Math.sin(angle) * 60 + this.generateOrganicVariation(0, variance);
+                    
+                    const endX = centerX + Math.cos(angle) * radius + this.generateOrganicVariation(0, variance * 2);
+                    const endY = centerY + Math.sin(angle) * radius + this.generateOrganicVariation(0, variance * 2);
+                    
+                    // Control points for organic bezier curves
+                    const cp1X = startX + Math.cos(angle + Math.PI/3) * 30 + this.generateOrganicVariation(0, variance);
+                    const cp1Y = startY + Math.sin(angle + Math.PI/3) * 30 + this.generateOrganicVariation(0, variance);
+                    const cp2X = endX - Math.cos(angle - Math.PI/4) * 40 + this.generateOrganicVariation(0, variance);
+                    const cp2Y = endY - Math.sin(angle - Math.PI/4) * 40 + this.generateOrganicVariation(0, variance);
+                    
+                    curves.push({
+                        path: `M ${startX},${startY} C ${cp1X},${cp1Y} ${cp2X},${cp2Y} ${endX},${endY}`,
+                        delay: i * 0.5
+                    });
+                }
+
+                // Add elliptical organic connections
+                for (let i = 0; i < 3; i++) {
+                    const cx = centerX + this.generateOrganicVariation(0, organicFactor);
+                    const cy = centerY + this.generateOrganicVariation(0, organicFactor);
+                    const rx = 40 + i * 20 + this.generateOrganicVariation(0, organicFactor);
+                    const ry = 25 + i * 15 + this.generateOrganicVariation(0, organicFactor);
+                    const rotation = this.generateOrganicVariation(0, 30);
+                    
+                    curves.push({
+                        ellipse: { cx, cy, rx, ry, rotation },
+                        delay: i * 1.2 + 4
+                    });
+                }
+
+                return curves;
+            }
+
+            generateVelocityTrails() {
+                const trails = [];
+                const baseX = 320;
+                const baseY = 280;
+                const variance = this.config.organicFactor;
+                
+                for (let i = 0; i < this.config.velocityTrails; i++) {
+                    const startX = baseX + this.generateOrganicVariation(0, variance);
+                    const startY = baseY + this.generateOrganicVariation(0, variance * 0.5);
+                    
+                    const length = 50 + Math.random() * 30;
+                    const curve = Math.sin(i * 0.5) * 8;
+                    
+                    const path = `M ${startX},${startY} Q ${startX + length/2},${startY + curve} ${startX + length},${startY + this.generateOrganicVariation(0, variance * 0.3)}`;
+                    
+                    trails.push({
+                        path,
+                        delay: i * 0.1,
+                        weight: 1.5 + Math.random() * 1
+                    });
+                }
+
+                return trails;
+            }
+
+            initializeGenerativeStructure() {
+                // Clear containers
+                this.structureContainer.innerHTML = '';
+                this.connectionsContainer.innerHTML = '';
+                this.nodeContainer.innerHTML = '';
+                this.velocityContainer.innerHTML = '';
+
+                // Generate 3D structure
+                const { vertices, connections } = this.createCubicStructure();
+                
+                // Create structure connections
+                connections.forEach((connection, index) => {
+                    const [start, end] = connection;
+                    const startVertex = vertices[start];
+                    const endVertex = vertices[end];
+                    
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', startVertex[0]);
+                    line.setAttribute('y1', startVertex[1]);
+                    line.setAttribute('x2', endVertex[0]);
+                    line.setAttribute('y2', endVertex[1]);
+                    line.setAttribute('class', 'organic-connection');
+                    line.style.animationDelay = `${index * 0.2}s`;
+                    
+                    this.structureContainer.appendChild(line);
+                });
+
+                // Generate organic curves
+                const curves = this.generateOrganicCurves();
+                curves.forEach((curve, index) => {
+                    if (curve.path) {
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', curve.path);
+                        path.setAttribute('class', 'curved-flow');
+                        path.style.animationDelay = `${curve.delay}s`;
+                        this.connectionsContainer.appendChild(path);
+                    } else if (curve.ellipse) {
+                        const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                        ellipse.setAttribute('cx', curve.ellipse.cx);
+                        ellipse.setAttribute('cy', curve.ellipse.cy);
+                        ellipse.setAttribute('rx', curve.ellipse.rx);
+                        ellipse.setAttribute('ry', curve.ellipse.ry);
+                        ellipse.setAttribute('transform', `rotate(${curve.ellipse.rotation} ${curve.ellipse.cx} ${curve.ellipse.cy})`);
+                        ellipse.setAttribute('class', 'curved-flow');
+                        ellipse.style.animationDelay = `${curve.delay}s`;
+                        this.connectionsContainer.appendChild(ellipse);
+                    }
+                });
+
+                // Generate nodes
+                vertices.forEach((vertex, index) => {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', vertex[0]);
+                    circle.setAttribute('cy', vertex[1]);
+                    circle.setAttribute('r', 5 + Math.random() * 2);
+                    circle.setAttribute('class', 'generative-node');
+                    circle.style.animationDelay = `${index * 0.3}s`;
+                    this.nodeContainer.appendChild(circle);
+                });
+
+                // Add extended nodes from curves
+                curves.slice(0, 6).forEach((curve, index) => {
+                    if (curve.path) {
+                        // Extract end point from path
+                        const pathData = curve.path.split(' ');
+                        const endX = parseFloat(pathData[pathData.length - 2].replace(',', ''));
+                        const endY = parseFloat(pathData[pathData.length - 1]);
+                        
+                        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        circle.setAttribute('cx', endX);
+                        circle.setAttribute('cy', endY);
+                        circle.setAttribute('r', 4 + Math.random() * 1.5);
+                        circle.setAttribute('class', 'generative-node');
+                        circle.style.animationDelay = `${(index + 8) * 0.3}s`;
+                        this.nodeContainer.appendChild(circle);
+                    }
+                });
+
+                // Generate velocity trails
+                const trails = this.generateVelocityTrails();
+                trails.forEach((trail, index) => {
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', trail.path);
+                    path.setAttribute('class', 'velocity-trail');
+                    path.style.animationDelay = `${trail.delay}s`;
+                    path.style.strokeWidth = `${trail.weight}px`;
+                    this.velocityContainer.appendChild(path);
+                });
+
+                // Add primary velocity node
+                const primaryNode = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                primaryNode.setAttribute('cx', '320');
+                primaryNode.setAttribute('cy', '280');
+                primaryNode.setAttribute('r', '6');
+                primaryNode.setAttribute('class', 'generative-node velocity-trail');
+                this.velocityContainer.appendChild(primaryNode);
+            }
+
+            bindQuantumInteractions() {
+                let mouseX = 0, mouseY = 0;
+                
+                document.addEventListener('mousemove', (e) => {
+                    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+                    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+                    
+                    const intensity = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
+                    
+                    // Dynamic field distortion
                     this.canvas.style.transform = `
-                        translate(${mouseX * 8}px, ${mouseY * 8}px) 
-                        scale(${1 + Math.abs(mouseX) * 0.03})
-                        rotateZ(${mouseX * 0.5}deg)
+                        translate(${mouseX * 6}px, ${mouseY * 6}px) 
+                        scale(${1 + intensity * 0.02})
+                        rotateZ(${mouseX * 0.3}deg)
+                        rotateY(${mouseX * 0.8}deg)
+                        rotateX(${mouseY * 0.5}deg)
                     `;
                     
-                    // Dynamic glitch intensity
-                    const intensity = Math.abs(mouseX) + Math.abs(mouseY);
+                    // Adaptive glitch intensity
                     document.documentElement.style.setProperty('--glitch-intensity', intensity);
                 });
 
-                // Temporal glitch bursts
+                // Quantum glitch bursts
                 setInterval(() => {
-                    this.triggerTemporalGlitch();
-                }, 4000 + Math.random() * 6000);
+                    if (Math.random() > 0.7) {
+                        this.triggerQuantumGlitch();
+                    }
+                }, 3000 + Math.random() * 4000);
 
-                // Performance optimization for mobile
-                if (window.innerWidth < 768 || navigator.hardwareConcurrency < 4) {
-                    this.optimizeForLowEnd();
+                // Regenerative cycles
+                setInterval(() => {
+                    if (Math.random() > 0.85) {
+                        this.regenerateSection();
+                    }
+                }, 15000 + Math.random() * 10000);
+            }
+
+            triggerQuantumGlitch() {
+                const elements = [...this.nodeContainer.children, ...this.connectionsContainer.children];
+                const glitchCount = Math.floor(Math.random() * 4) + 2;
+                
+                for (let i = 0; i < glitchCount; i++) {
+                    const element = elements[Math.floor(Math.random() * elements.length)];
+                    if (element) {
+                        setTimeout(() => {
+                            element.style.filter = 'url(#quantumGlitch)';
+                            element.style.stroke = `var(--glitch-${['red', 'cyan', 'amber', 'violet'][i % 4]})`;
+                            
+                            setTimeout(() => {
+                                element.style.filter = 'url(#organicTexture)';
+                                element.style.stroke = 'var(--ink-primary)';
+                            }, 150 + Math.random() * 100);
+                        }, i * 30);
+                    }
                 }
             }
 
-            triggerTemporalGlitch() {
-                const randomNodes = Array.from(this.nodes)
-                    .sort(() => 0.5 - Math.random())
-                    .slice(0, 3);
+            regenerateSection() {
+                // Regenerate a random section for continuous variation
+                const sections = ['curves', 'trails'];
+                const section = sections[Math.floor(Math.random() * sections.length)];
+                
+                if (section === 'curves') {
+                    // Regenerate some organic curves
+                    const curves = this.generateOrganicCurves().slice(0, 3);
+                    
+                    // Remove old curves
+                    const existingCurves = [...this.connectionsContainer.children].slice(-3);
+                    existingCurves.forEach(curve => curve.remove());
+                    
+                    // Add new curves
+                    curves.forEach((curve, index) => {
+                        if (curve.path) {
+                            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                            path.setAttribute('d', curve.path);
+                            path.setAttribute('class', 'curved-flow');
+                            path.style.animationDelay = `${curve.delay}s`;
+                            this.connectionsContainer.appendChild(path);
+                        }
+                    });
+                } else if (section === 'trails') {
+                    // Regenerate velocity trails
+                    this.velocityContainer.innerHTML = '';
+                    const trails = this.generateVelocityTrails();
+                    
+                    trails.forEach((trail, index) => {
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', trail.path);
+                        path.setAttribute('class', 'velocity-trail');
+                        path.style.animationDelay = `${trail.delay}s`;
+                        path.style.strokeWidth = `${trail.weight}px`;
+                        this.velocityContainer.appendChild(path);
+                    });
 
-                randomNodes.forEach((node, index) => {
-                    setTimeout(() => {
-                        node.style.filter = 'url(#glitchDisplace)';
-                        node.style.stroke = `var(--glitch-${['red', 'cyan', 'yellow'][index % 3]})`;
-                        
-                        setTimeout(() => {
-                            node.style.filter = 'url(#roughPaper)';
-                            node.style.stroke = 'var(--primary-stroke)';
-                        }, 200);
-                    }, index * 50);
-                });
+                    // Re-add primary velocity node
+                    const primaryNode = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    primaryNode.setAttribute('cx', '320');
+                    primaryNode.setAttribute('cy', '280');
+                    primaryNode.setAttribute('r', '6');
+                    primaryNode.setAttribute('class', 'generative-node velocity-trail');
+                    this.velocityContainer.appendChild(primaryNode);
+                }
             }
 
-            optimizeForLowEnd() {
-                // Reduce animation complexity
-                this.connections.forEach(conn => {
-                    if (!conn.classList.contains('motion-streak')) {
-                        conn.style.animation = 'none';
+            startTemporalLoop() {
+                const animate = () => {
+                    this.time += 0.016;
+                    
+                    // Subtle organic breathing effect
+                    if (this.performanceLevel !== 'low') {
+                        const breathe = Math.sin(this.time * 0.5) * 0.5 + 1;
+                        document.documentElement.style.setProperty('--temporal-speed', breathe);
                     }
-                });
+                    
+                    this.animationFrame = requestAnimationFrame(animate);
+                };
                 
-                // Simplify glitch effects
-                this.glitchLayers.forEach(layer => {
-                    layer.style.display = 'none';
-                });
+                animate();
+            }
+
+            destroy() {
+                if (this.animationFrame) {
+                    cancelAnimationFrame(this.animationFrame);
+                }
             }
         }
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
-            new TemporalDisplacementEngine();
-        });
-
-        // Reality stability monitoring
-        window.addEventListener('load', () => {
-            document.body.style.opacity = '1';
-            console.log('// TEMPORAL_DISPLACEMENT_ENGINE: ACTIVE //');
-            console.log('// REALITY_BUFFER: STABLE //');
-            console.log('// DIMENSIONAL_INTEGRITY: 73.2% //');
+            const engine = new AdvancedGenerativeEngine();
+            
+            // Performance monitoring
+            window.addEventListener('beforeunload', () => {
+                engine.destroy();
+            });
+            
+            // Development logging
+            console.log('// ADVANCED_GENERATIVE_ENGINE: INITIALIZED //');
+            console.log('// NEURAL_PATHWAY_STATUS: ADAPTIVE //');
+            console.log('// QUANTUM_COHERENCE: STABLE //');
         });
     </script>
 </body>
